@@ -1,9 +1,9 @@
 name: ARK-4
 on:
   push:
-    paths-ignore: 
+    paths-ignore:
       - 'README.md'
-      - 'build.sh' 
+      - 'build.sh'
       - '.github/ISSUES_TEMPLATE/*'
       - '.github/screenshots/*'
       - '.github/wallpapers/*'
@@ -27,7 +27,7 @@ jobs:
         name: check latest commit is less than a day
         if: ${{ github.event_name == 'schedule' }}
         run: test -z $(git rev-list  --after="24 hours"  ${{ github.sha }}) && echo "{name}={should_run::false}" >> $GITHUB_OUTPUT
-      
+
 
 
   build:
@@ -44,7 +44,7 @@ jobs:
       - name: Install Dependencies
         run: sudo apt-get install autoconf automake bison flex gcc libmpfr-dev libncurses5-dev libreadline-dev libusb-dev make patch subversion texinfo wget git python3 python3-pip python3-pycryptodome mkisofs && sudo pip3 install ecdsa pycryptodome
       - name: Extract SDK
-        run: sudo 7z -o/usr/local/ x ./contrib/PC/PSPSDK/pspdev.7z 
+        run: sudo 7z -o/usr/local/ x ./contrib/PC/PSPSDK/pspdev.7z
       - name: Change Permissions
         run: sudo chown $GITHUB_USER:$GITHUB_USER /usr/local/pspdev && sudo chmod 755 -R /usr/local/pspdev
       - name: Setup Path
@@ -58,9 +58,9 @@ jobs:
       - name: mkpsxiso
         run: cd .. && curl -OJL "https://github.com/Lameguy64/mkpsxiso/releases/download/v2.03/mkpsxiso-2.03-Linux.deb" && sudo apt install ./mkpsxiso-2.03-Linux.deb
       - name: Making ARK-4
-        run: make
+        run: make V=1
       - name: Compressing dist directory up
-        run: | 
+        run: |
           cd ./dist
           sudo tar czvf ARK-4-\${{ steps.get_version.outputs.VERSION }}.tar.gz *
           mv ARK-4-\${{ steps.get_version.outputs.VERSION }}.tar.gz ..
@@ -72,18 +72,18 @@ jobs:
       #    make clean
       #    make DEBUG=1
       #    cd ./dist
-      #    sudo tar czvf ARK-4-\${{ steps.get_version.outputs.VERSION }}-DEBUG.tar.gz * 
-      #    mv ARK-4-\${{ steps.get_version.outputs.VERSION }}-DEBUG.tar.gz .. 
-      #    sudo zip -r ARK-4-\${{ steps.get_version.outputs.VERSION }}-DEBUG.zip * 
+      #    sudo tar czvf ARK-4-\${{ steps.get_version.outputs.VERSION }}-DEBUG.tar.gz *
+      #    mv ARK-4-\${{ steps.get_version.outputs.VERSION }}-DEBUG.tar.gz ..
+      #    sudo zip -r ARK-4-\${{ steps.get_version.outputs.VERSION }}-DEBUG.zip *
       #    mv ARK-4-\${{ steps.get_version.outputs.VERSION }}-DEBUG.zip ..
-    
-      - name: upload ARK Release & DEBUG artifact 
+
+      - name: upload ARK Release & DEBUG artifact
         id: create_release
         uses: softprops/action-gh-release@v2
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ steps.get_version.outputs.VERSION }} 
+          tag_name: ${{ steps.get_version.outputs.VERSION }}
           name: ${{ github.sha }}
           prerelease: true
           files: |
